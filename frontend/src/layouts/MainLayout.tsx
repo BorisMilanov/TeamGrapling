@@ -11,22 +11,35 @@ const MainLayout: React.FC = () => {
   } = theme.useToken();
 
   return (
+    // Changed to 100vh to ensure the background covers the whole screen
     <Layout style={{ minHeight: '100vh' }}>
       <AppHeader />
-      <Content style={{ padding: '24px 50px' }}>
+      
+      <Content style={{ 
+        marginTop: 64, // Matches Header height
+        padding: '16px', // Slightly smaller padding for mobile feel
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
         <div
           style={{
             background: colorBgContainer,
-            minHeight: '80vh',
+            /* 
+               IMPORTANT: CSS calc() MUST have spaces around the minus sign.
+               100vh (viewport) - 64px (header) - 70px (footer estimate) 
+            */
+            minHeight: 'calc(100vh - 150px)', 
             padding: 24,
             borderRadius: borderRadiusLG,
+            flex: 1 // Ensures this div grows to fill available space
           }}
         >
           <Outlet />
         </div>
       </Content>
-      <Footer style={{ textAlign: 'center' }}>
-        Ant Design ©{new Date().getFullYear()} Developed with React + TS
+
+      <Footer style={{ textAlign: 'center', padding: '20px 0' }}>
+        Team Grapling ©{new Date().getFullYear()}
       </Footer>
     </Layout>
   );

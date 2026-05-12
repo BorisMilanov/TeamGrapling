@@ -6,6 +6,3 @@ html, body, #root {
 }
 
 /* Ensure the Ant Design Layout component also takes full height */
-.ant-layout {
-  min-height: 100vh !important;
-}
