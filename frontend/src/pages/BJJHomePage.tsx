@@ -1,12 +1,13 @@
 import React, { useRef, useEffect, useState } from 'react';
 import {
   Layout, Menu, Button, Row, Col, Typography, Card, Table,
-  Space, Divider, ConfigProvider, Tag,
+  Space, Divider, ConfigProvider, Tag, Dropdown,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { Users, ShieldCheck, Trophy, MapPin, Phone, CheckCircle2, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router';
-import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
+import { MenuOutlined, CloseOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons';
+import { authStorage } from '../services/authApi';
 import herohomeImage from '../assets/herohome.jpg';
 
 const { Header, Content, Footer } = Layout;
@@ -55,10 +56,16 @@ const BJJHomePage: React.FC = () => {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scheduleHover, setScheduleHover] = useState(false);
+  const [user, setUser] = useState(authStorage.getUser);
 
-  const benefitsReveal = useScrollReveal();
-  const scheduleReveal = useScrollReveal();
-  const ctaReveal = useScrollReveal();
+  const handleLogout = () => {
+    authStorage.clear();
+    setUser(null);
+  };
+
+  const { ref: benefitsRef, isVisible: benefitsVisible } = useScrollReveal();
+  const { ref: scheduleRef, isVisible: scheduleVisible } = useScrollReveal();
+  const { ref: ctaRef, isVisible: ctaVisible } = useScrollReveal();
 
   const scheduleData: ScheduleItem[] = [
     { key: '1', time: '17:00 - 18:30', mon: 'Основи', tue: 'No-Gi', wed: 'Основи', thu: 'No-Gi', fri: 'Open Mat' },
@@ -104,14 +111,37 @@ const BJJHomePage: React.FC = () => {
           </div>
 
           {/* Desktop nav */}
-          <div className="desktop-nav">
+          <div className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <Menu
               theme="dark" mode="horizontal"
               defaultSelectedKeys={['hero']}
               items={navItems}
               onClick={(e) => scrollTo(e.key)}
-              style={{ minWidth: 380, borderBottom: 'none', justifyContent: 'flex-end' }}
+              style={{ minWidth: 300, borderBottom: 'none', justifyContent: 'flex-end' }}
             />
+            {user ? (
+              <Dropdown
+                menu={{
+                  items: [
+                    { key: 'logout', label: 'Изход', icon: <LogoutOutlined />, onClick: handleLogout },
+                  ],
+                }}
+                placement="bottomRight"
+              >
+                <Button
+                  type="text"
+                  icon={<UserOutlined />}
+                  style={{ color: 'white', fontWeight: 600 }}
+                >
+                  {user.firstName}
+                </Button>
+              </Dropdown>
+            ) : (
+              <Space>
+                <Button type="text" style={{ color: 'white' }} onClick={() => navigate('/login')}>Влез</Button>
+                <Button type="primary" onClick={() => navigate('/register')}>Регистрация</Button>
+              </Space>
+            )}
           </div>
 
           {/* Mobile hamburger */}
@@ -170,7 +200,7 @@ const BJJHomePage: React.FC = () => {
 
           {/* ── BENEFITS ── */}
           <section id="programs" style={{ padding: '90px 10%' }}>
-            <div ref={benefitsReveal.ref}>
+            <div ref={benefitsRef}>
               <Row gutter={[32, 32]} justify="center">
                 {[
                   { icon: <ShieldCheck size={40} />, title: 'Самозащита', text: 'Реални умения за реални ситуации.', delay: 0 },
@@ -178,7 +208,7 @@ const BJJHomePage: React.FC = () => {
                   { icon: <Users size={40} />, title: 'Общност', text: 'Намери приятели за цял живот на татамито.', delay: 240 },
                 ].map((item, i) => (
                   <Col xs={24} md={8} key={i}>
-                    <div style={revealStyle(benefitsReveal.isVisible, item.delay)}>
+                    <div style={revealStyle(benefitsVisible, item.delay)}>
                       <Card bordered={false} style={{ textAlign: 'center', background: '#fafafa', borderRadius: 16 }}>
                         <div style={{ color: '#1890ff', marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
                           {item.icon}
@@ -196,12 +226,12 @@ const BJJHomePage: React.FC = () => {
           {/* ── SCHEDULE (GRAPHIC) — clickable, scroll-reveal ── */}
           <section
             id="schedule"
-            ref={scheduleReveal.ref}
+            ref={scheduleRef}
             onClick={() => navigate('/graphic')}
             onMouseEnter={() => setScheduleHover(true)}
             onMouseLeave={() => setScheduleHover(false)}
             style={{
-              ...revealStyle(scheduleReveal.isVisible),
+              ...revealStyle(scheduleVisible),
               padding: '70px 10%',
               background: scheduleHover ? '#f0f7ff' : '#fff',
               cursor: 'pointer',
@@ -242,13 +272,13 @@ const BJJHomePage: React.FC = () => {
           <section
             id="contact"
             style={{
-              ...revealStyle(ctaReveal.isVisible),
+              ...revealStyle(ctaVisible),
               padding: '100px 20px',
               background: '#001529',
               textAlign: 'center',
             }}
           >
-            <div ref={ctaReveal.ref}>
+            <div ref={ctaRef}>
               <Title level={2} style={{ color: 'white', marginBottom: 24 }}>
                 Не знаеш откъде да започнеш?
               </Title>
