@@ -91,6 +91,7 @@ const BJJHomePage: React.FC = () => {
     { key: 'hero', label: 'Начало' },
     { key: 'schedule', label: 'График' },
     { key: 'contact', label: 'Контакти' },
+    ...(user ? [{ key: 'calendar-link', label: 'Календар' }] : []),
   ];
 
   return (
@@ -116,7 +117,7 @@ const BJJHomePage: React.FC = () => {
               theme="dark" mode="horizontal"
               defaultSelectedKeys={['hero']}
               items={navItems}
-              onClick={(e) => scrollTo(e.key)}
+              onClick={(e) => e.key === 'calendar-link' ? navigate('/calendar') : scrollTo(e.key)}
               style={{ minWidth: 300, borderBottom: 'none', justifyContent: 'flex-end' }}
             />
             {user ? (
@@ -163,7 +164,7 @@ const BJJHomePage: React.FC = () => {
             <Menu
               theme="dark" mode="vertical"
               items={navItems}
-              onClick={(e) => scrollTo(e.key)}
+              onClick={(e) => e.key === 'calendar-link' ? navigate('/calendar') : scrollTo(e.key)}
               style={{ borderRight: 'none' }}
             />
           </div>

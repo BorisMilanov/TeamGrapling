@@ -5,6 +5,8 @@ import BJJHomePage from './pages/BJJHomePage';
 import ScheduleTable from './pages/ScheduleTable';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import CalendarPage from './pages/CalendarPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const Price: React.FC = () => <h2 style={{ padding: 40 }}>Pricing Table</h2>;
 const About: React.FC = () => <h2 style={{ padding: 40 }}>About the Team</h2>;
@@ -19,6 +21,14 @@ function App(): React.JSX.Element {
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/calendar"
+          element={
+            <ProtectedRoute>
+              <CalendarPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
