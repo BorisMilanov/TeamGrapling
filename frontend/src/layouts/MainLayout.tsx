@@ -13,7 +13,7 @@ const MainLayout: React.FC = () => {
   return (
     // Changed to 100vh to ensure the background covers the whole screen
     <Layout style={{ minHeight: '100vh' }}>
-      <AppHeader />
+      <AppHeader scrollToSection={() => {}} />
       
       <Content style={{ 
         marginTop: 64, // Matches Header height

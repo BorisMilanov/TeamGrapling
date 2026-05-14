@@ -1,90 +1,209 @@
+// import React, { useState } from 'react';
+// import { Layout, Menu, Button, Drawer, Grid } from 'antd';
+// import { MenuOutlined } from '@ant-design/icons';
+// import { useNavigate, useLocation } from 'react-router';
+// const { Header } = Layout;
+// const { useBreakpoint } = Grid;
+
+// const AppHeader: React.FC = () => {
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   const screens = useBreakpoint();
+//   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+
+//   const menuItems = [
+//     { key: '/', label: 'Home' },
+//     { key: '/graphic', label: 'Schedule' },
+//     { key: '/price', label: 'Price' },
+//     { key: '/about', label: 'About' },
+//   ];
+
+//   const handleNavigation = (key: string) => {
+//     navigate(key);
+//     setIsDrawerVisible(false);
+//   };
+
+//   return (
+//     <Header
+//       style={{
+//         position: 'fixed',
+//         zIndex: 100,
+//         width: '100%',
+//         display: 'flex',
+//         alignItems: 'center',
+//         justifyContent: 'space-between',
+//         // Fix: Desktop gets 111px, Mobile gets 20px
+//         padding: screens.md ? '0 111px' : '0 20px',
+//         background: '#001529', // Standard AntD Dark
+//         transition: 'padding 0.3s'
+//       }}
+//     >
+//       {/* Logo Section */}
+//       <div 
+//         style={{ color: 'white', fontWeight: 'bold', fontSize: '1.2rem', cursor: 'pointer' }}
+//         onClick={() => navigate('/')}
+//       >
+//         TEAM GRAPLING
+//       </div>
+
+//       {/* Desktop Navigation */}
+//       {screens.md ? (
+//         <Menu
+//           theme="dark"
+//           mode="horizontal"
+//           selectedKeys={[location.pathname]}
+//           items={menuItems}
+//           onClick={(e) => navigate(e.key)}
+//           style={{ flex: 1, minWidth: 0, justifyContent: 'end', borderBottom: 'none' }}
+//         />
+//       ) : (
+//         /* Mobile Hamburger Button */
+//         <Button
+//           type="text"
+//           icon={<MenuOutlined style={{ color: 'white', fontSize: '1.2rem' }} />}
+//           onClick={() => setIsDrawerVisible(true)}
+//         />
+//       )}
+
+//       {/* Mobile Fullscreen Menu */}
+//       <Drawer
+//         title="NAVIGATION"
+//         placement="right"
+//         onClose={() => setIsDrawerVisible(false)}
+//         open={isDrawerVisible}
+//         styles={{ body: { padding: 0 } }}
+//         width="100vw"
+//       >
+//         <Menu
+//           mode="vertical"
+//           selectedKeys={[location.pathname]}
+//           items={menuItems}
+//           onClick={(e) => handleNavigation(e.key)}
+//           style={{ borderInlineEnd: 'none' }}
+//         />
+//       </Drawer>
+//     </Header>
+//   );
+// };
+
+// export default AppHeader;
 import React, { useState } from 'react';
-import { Layout, Menu, Button, Drawer, Grid } from 'antd';
-import { MenuOutlined } from '@ant-design/icons';
-import { useNavigate, useLocation } from 'react-router';
+import { Layout, Menu } from 'antd';
+import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
+import type { MenuProps } from 'antd';
 
 const { Header } = Layout;
-const { useBreakpoint } = Grid;
 
-const AppHeader: React.FC = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const screens = useBreakpoint();
-  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+// Define your clean structure array
+const menuItems = [
+  { key: '/', label: 'Начало' },
+  { key: '/graphic', label: 'ScheduleTable' },
+  { key: '/price', label: 'Price' },
+  { key: '/about', label: 'Контакти' },
+];
 
-  const menuItems = [
-    { key: '/', label: 'Home' },
-    { key: '/graphic', label: 'Graphic' },
-    { key: '/price', label: 'Price' },
-    { key: '/about', label: 'About' },
-  ];
+interface CustomHeaderProps {
+  scrollToSection: (id: string) => void;
+}
 
-  const handleNavigation = (key: string) => {
-    navigate(key);
-    setIsDrawerVisible(false);
+const CustomHeader: React.FC<CustomHeaderProps> = ({ scrollToSection }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+
+  // Ant Design Menu onClick handler signature
+  const handleMenuClick: MenuProps['onClick'] = (info) => {
+    const path = info.key; // e.g., '/graphic' or '/'
+
+    if (path === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // Remove the leading slash to match your section ID (e.g., 'graphic')
+      const sectionId = path.replace('/', '');
+      scrollToSection(sectionId);
+    }
+
+    // Close mobile dropdown menu if it's open
+    setIsMobileMenuOpen(false);
   };
 
   return (
-    <Header
-      style={{
-        position: 'fixed',
-        zIndex: 100,
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        // Fix: Desktop gets 111px, Mobile gets 20px
-        padding: screens.md ? '0 111px' : '0 20px',
-        background: '#001529', // Standard AntD Dark
-        transition: 'padding 0.3s'
-      }}
-    >
-      {/* Logo Section */}
-      <div 
-        style={{ color: 'white', fontWeight: 'bold', fontSize: '1.2rem', cursor: 'pointer' }}
-        onClick={() => navigate('/')}
+    <>
+      <Header
+        style={{
+          position: 'fixed',
+          zIndex: 1000,
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 50px',
+          background: '#001529',
+          height: '64px',
+        }}
       >
-        TEAM GRAPLING
-      </div>
+        {/* Brand Logo */}
+        <div style={{ color: 'white', fontWeight: 'bold', fontSize: '20px' }}>
+          OSSU <span style={{ color: '#1890ff' }}>BJJ</span>
+        </div>
 
-      {/* Desktop Navigation */}
-      {screens.md ? (
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          selectedKeys={[location.pathname]}
-          items={menuItems}
-          onClick={(e) => navigate(e.key)}
-          style={{ flex: 1, minWidth: 0, justifyContent: 'end', borderBottom: 'none' }}
-        />
-      ) : (
-        /* Mobile Hamburger Button */
-        <Button
-          type="text"
-          icon={<MenuOutlined style={{ color: 'white', fontSize: '1.2rem' }} />}
-          onClick={() => setIsDrawerVisible(true)}
-        />
+        {/* --- DESKTOP MENU --- */}
+        <div className="desktop-menu-wrapper" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            defaultSelectedKeys={['/']}
+            items={menuItems} // Passes your configuration array directly here
+            onClick={handleMenuClick} // Intercepts the click events uniformly
+            style={{ minWidth: '400px', borderBottom: 'none', justifyContent: 'flex-end' }}
+          />
+        </div>
+
+        {/* --- MOBILE HAMBURGER ICON --- */}
+        <div 
+          className="mobile-burger-btn" 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          style={{ color: 'white', fontSize: '22px', cursor: 'pointer', display: 'none' }}
+        >
+          {isMobileMenuOpen ? <CloseOutlined /> : <MenuOutlined />}
+        </div>
+      </Header>
+
+      {/* --- MOBILE DROPDOWN --- */}
+      {isMobileMenuOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '64px',
+            left: 0,
+            width: '100%',
+            backgroundColor: '#001529',
+            zIndex: 999,
+            borderTop: '1px solid #002140',
+          }}
+        >
+          <Menu
+            theme="dark"
+            mode="vertical"
+            defaultSelectedKeys={['/']}
+            items={menuItems}
+            onClick={handleMenuClick}
+            style={{ borderRight: 'none' }}
+          />
+        </div>
       )}
 
-      {/* Mobile Fullscreen Menu */}
-      <Drawer
-        title="NAVIGATION"
-        placement="right"
-        onClose={() => setIsDrawerVisible(false)}
-        open={isDrawerVisible}
-        styles={{ body: { padding: 0 } }}
-        width="100vw"
-      >
-        <Menu
-          mode="vertical"
-          selectedKeys={[location.pathname]}
-          items={menuItems}
-          onClick={(e) => handleNavigation(e.key)}
-          style={{ borderInlineEnd: 'none' }}
-        />
-      </Drawer>
-    </Header>
+      {/* Responsive Breakpoint Handling */}
+      <style>{`
+        @media (max-width: 768px) {
+          .desktop-menu-wrapper {
+            display: none !important;
+          }
+          .mobile-burger-btn {
+            display: block !important;
+          }
+        }
+      `}</style>
+    </>
   );
 };
 
-export default AppHeader;
+export default CustomHeader;

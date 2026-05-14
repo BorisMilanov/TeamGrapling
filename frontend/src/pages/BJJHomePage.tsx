@@ -1,12 +1,17 @@
-import React from 'react';
-import { Layout, Menu, Button, Row, Col, Typography, Card, Table, Space, Divider, ConfigProvider, Tag } from 'antd';
+import React, { useRef, useEffect, useState } from 'react';
+import {
+  Layout, Menu, Button, Row, Col, Typography, Card, Table,
+  Space, Divider, ConfigProvider, Tag,
+} from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { Users, ShieldCheck, Trophy, MapPin, Phone, CheckCircle2 } from 'lucide-react';
+import { Users, ShieldCheck, Trophy, MapPin, Phone, CheckCircle2, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
+import herohomeImage from '../assets/herohome.jpg';
 
 const { Header, Content, Footer } = Layout;
 const { Title, Paragraph, Text } = Typography;
 
-// Дефиниране на интерфейс за данните в графика
 interface ScheduleItem {
   key: string;
   time: string;
@@ -17,16 +22,51 @@ interface ScheduleItem {
   fri: string;
 }
 
+function useScrollReveal(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold },
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return { ref, isVisible };
+}
+
+function revealStyle(isVisible: boolean, delay = 0): React.CSSProperties {
+  return {
+    opacity: isVisible ? 1 : 0,
+    transform: isVisible ? 'translateY(0)' : 'translateY(40px)',
+    transition: `opacity 0.65s ease ${delay}ms, transform 0.65s ease ${delay}ms`,
+  };
+}
+
 const BJJHomePage: React.FC = () => {
-  // Данни за графика с типизация
+  const navigate = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scheduleHover, setScheduleHover] = useState(false);
+
+  const benefitsReveal = useScrollReveal();
+  const scheduleReveal = useScrollReveal();
+  const ctaReveal = useScrollReveal();
+
   const scheduleData: ScheduleItem[] = [
-    { key: '1', time: '18:00 - 19:30', mon: 'Основи', tue: 'No-Gi', wed: 'Основи', thu: 'No-Gi', fri: 'Open Mat' },
-    { key: '2', time: '19:30 - 21:00', mon: 'Напреднали', tue: 'Напреднали', wed: 'Напреднали', thu: 'Напреднали', fri: 'Спаринг' },
+    { key: '1', time: '17:00 - 18:30', mon: 'Основи', tue: 'No-Gi', wed: 'Основи', thu: 'No-Gi', fri: 'Open Mat' },
+  
   ];
 
-  // Типизиране на колоните на Ant Design Table
   const columns: ColumnsType<ScheduleItem> = [
-    { title: 'Час', dataIndex: 'time', key: 'time', fixed: 'left', width: 120 },
+    { title: 'Час', dataIndex: 'time', key: 'time', fixed: 'left', width: 130 },
     { title: 'Пон', dataIndex: 'mon', key: 'mon' },
     { title: 'Вт', dataIndex: 'tue', key: 'tue' },
     { title: 'Ср', dataIndex: 'wed', key: 'wed' },
@@ -34,156 +74,213 @@ const BJJHomePage: React.FC = () => {
     { title: 'Пет', dataIndex: 'fri', key: 'fri' },
   ];
 
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    setMobileOpen(false);
+  };
+
+  const navItems = [
+    { key: 'hero', label: 'Начало' },
+    { key: 'schedule', label: 'График' },
+    { key: 'contact', label: 'Контакти' },
+  ];
+
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: '#1890ff',
-          borderRadius: 8,
-        },
-      }}
-    >
+    <ConfigProvider theme={{ token: { colorPrimary: '#1890ff', borderRadius: 8 } }}>
       <Layout style={{ minHeight: '100vh', background: '#fff' }}>
-        {/* Навигация */}
-        <Header style={{ 
-          position: 'fixed', 
-          zIndex: 10, 
-          width: '100%', 
-          display: 'flex', 
-          alignItems: 'center', 
-          padding: '0 50px',
-          background: '#001529' 
+
+        {/* ── HEADER ── */}
+        <Header style={{
+          position: 'fixed', zIndex: 1000, width: '100%',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 50px', background: '#001529', height: 64,
         }}>
-          <div style={{ color: 'white', fontWeight: 'bold', fontSize: '20px', marginRight: '40px' }}>
+          <div
+            style={{ color: 'white', fontWeight: 'bold', fontSize: 20, cursor: 'pointer' }}
+            onClick={() => scrollTo('hero')}
+          >
             OSSU <span style={{ color: '#1890ff' }}>BJJ</span>
           </div>
-          <Menu 
-            theme="dark" 
-            mode="horizontal" 
-            defaultSelectedKeys={['1']} 
-            style={{ flex: 1, minWidth: 0 }}
-            items={[
-              { key: '1', label: 'Начало' },
-              { key: '2', label: 'Програми' },
-              { key: '3', label: 'График' },
-              { key: '4', label: 'Контакти' },
-            ]}
-          />
-       
+
+          {/* Desktop nav */}
+          <div className="desktop-nav">
+            <Menu
+              theme="dark" mode="horizontal"
+              defaultSelectedKeys={['hero']}
+              items={navItems}
+              onClick={(e) => scrollTo(e.key)}
+              style={{ minWidth: 380, borderBottom: 'none', justifyContent: 'flex-end' }}
+            />
+          </div>
+
+          {/* Mobile hamburger */}
+          <div
+            className="mobile-burger"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            style={{ color: 'white', fontSize: 22, cursor: 'pointer', display: 'none' }}
+          >
+            {mobileOpen ? <CloseOutlined /> : <MenuOutlined />}
+          </div>
         </Header>
 
-        <Content style={{ marginTop: 64 }}>
-          {/* Hero Секция */}
-          <div style={{ 
-            background: 'linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url("https://images.unsplash.com/photo-1552072092-7f9b8d63efcb?q=80&w=2070") center/cover',
-            height: '70vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-            color: 'white',
-            padding: '0 20px'
+        {/* Mobile dropdown */}
+        {mobileOpen && (
+          <div style={{
+            position: 'fixed', top: 64, left: 0, width: '100%',
+            background: '#001529', zIndex: 999, borderTop: '1px solid #002140',
           }}>
-            <div style={{ maxWidth: '800px' }}>
-              <Title style={{ color: 'white', fontSize: 'clamp(32px, 5vw, 56px)', marginBottom: '24px' }}>
-                ПРОМЕНИ ЖИВОТА СИ С <br/> 
+            <Menu
+              theme="dark" mode="vertical"
+              items={navItems}
+              onClick={(e) => scrollTo(e.key)}
+              style={{ borderRight: 'none' }}
+            />
+          </div>
+        )}
+
+        <Content style={{ marginTop: 64 }}>
+
+          {/* ── HERO ── */}
+          <div id="hero" style={{
+            backgroundImage: `linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url(${herohomeImage})`,
+            backgroundSize: 'cover', backgroundPosition: 'center',
+            height: '90vh', display: 'flex', alignItems: 'center',
+            justifyContent: 'center', textAlign: 'center', color: 'white', padding: '0 20px',
+          }}>
+            <div style={{ maxWidth: 800 }}>
+              <Title style={{ color: 'white', fontSize: 'clamp(32px,5vw,60px)', marginBottom: 24 }}>
+                ПРОМЕНИ ЖИВОТА СИ С <br />
                 <span style={{ color: '#1890ff' }}>БРАЗИЛСКО ЖИУ-ЖИЦУ</span>
               </Title>
-              <Paragraph style={{ color: 'white', fontSize: '1.2rem', marginBottom: '40px' }}>
-                Добре дошли в най-гостоприемната зала за бойни изкуства. 
+              <Paragraph style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1.2rem', marginBottom: 40 }}>
+                Добре дошли в най-гостоприемната зала за бойни изкуства.
                 Започни своето пътешествие днес!
               </Paragraph>
               <Space size="large" wrap>
-                <Button type="primary" size="large" style={{ height: '50px', padding: '0 40px' }}>
-                  ГРАБНИ БЕЗПЛАТЕН ПАС
+                <Button type="primary" size="large" style={{ height: 50, padding: '0 40px' }}>
+                  ЗАПИШИ СЕ СЕГА
                 </Button>
-                <Button ghost size="large" style={{ height: '50px' }}>
-                  ВИЖ ПРОГРАМИТЕ
+                <Button ghost size="large" style={{ height: 50 }} onClick={() => scrollTo('schedule')}>
+                  График на тренировките
                 </Button>
               </Space>
             </div>
           </div>
 
-          {/* Предимства */}
-          <section style={{ padding: '80px 10%' }}>
-            <Row gutter={[32, 32]} justify="center">
-              {[
-                { icon: <ShieldCheck size={40} />, title: 'Самозащита', text: 'Реални умения за реални ситуации.' },
-                { icon: <Trophy size={40} />, title: 'Успех', text: 'Изгради шампионска нагласа в живота.' },
-                { icon: <Users size={40} />, title: 'Общност', text: 'Намери приятели за цял живот на татамито.' }
-              ].map((item, index) => (
-                <Col xs={24} md={8} key={index}>
-                  <Card bordered={false} style={{ textAlign: 'center', background: '#fafafa', borderRadius: '16px' }}>
-                    <div style={{ color: '#1890ff', marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
-                      {item.icon}
+          {/* ── BENEFITS ── */}
+          <section id="programs" style={{ padding: '90px 10%' }}>
+            <div ref={benefitsReveal.ref}>
+              <Row gutter={[32, 32]} justify="center">
+                {[
+                  { icon: <ShieldCheck size={40} />, title: 'Самозащита', text: 'Реални умения за реални ситуации.', delay: 0 },
+                  { icon: <Trophy size={40} />, title: 'Успех', text: 'Изгради шампионска нагласа в живота.', delay: 120 },
+                  { icon: <Users size={40} />, title: 'Общност', text: 'Намери приятели за цял живот на татамито.', delay: 240 },
+                ].map((item, i) => (
+                  <Col xs={24} md={8} key={i}>
+                    <div style={revealStyle(benefitsReveal.isVisible, item.delay)}>
+                      <Card bordered={false} style={{ textAlign: 'center', background: '#fafafa', borderRadius: 16 }}>
+                        <div style={{ color: '#1890ff', marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+                          {item.icon}
+                        </div>
+                        <Title level={3}>{item.title}</Title>
+                        <Paragraph type="secondary">{item.text}</Paragraph>
+                      </Card>
                     </div>
-                    <Title level={3}>{item.title}</Title>
-                    <Paragraph type="secondary">{item.text}</Paragraph>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
+                  </Col>
+                ))}
+              </Row>
+            </div>
           </section>
 
-          {/* График */}
-          <section style={{ padding: '60px 10%', background: '#fff' }}>
-            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          {/* ── SCHEDULE (GRAPHIC) — clickable, scroll-reveal ── */}
+          <section
+            id="schedule"
+            ref={scheduleReveal.ref}
+            onClick={() => navigate('/graphic')}
+            onMouseEnter={() => setScheduleHover(true)}
+            onMouseLeave={() => setScheduleHover(false)}
+            style={{
+              ...revealStyle(scheduleReveal.isVisible),
+              padding: '70px 10%',
+              background: scheduleHover ? '#f0f7ff' : '#fff',
+              cursor: 'pointer',
+              transition: [
+                `opacity 0.65s ease`,
+                `transform 0.65s ease`,
+                `background 0.3s ease`,
+              ].join(', '),
+              outline: scheduleHover ? '2px solid #1890ff' : '2px solid transparent',
+              outlineOffset: -2,
+              borderRadius: 0,
+            }}
+          >
+            <div style={{ textAlign: 'center', marginBottom: 48 }}>
               <Tag color="blue">SCHEDULE</Tag>
               <Title level={2}>График на тренировките</Title>
+              {scheduleHover && (
+                <Text type="secondary" style={{ fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  Виж пълния график <ArrowRight size={16} />
+                </Text>
+              )}
             </div>
-            <Table 
-              dataSource={scheduleData} 
-              columns={columns} 
-              pagination={false} 
-              bordered 
+            <Table
+              dataSource={scheduleData}
+              columns={columns}
+              pagination={false}
+              bordered
               scroll={{ x: 700 }}
-              style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+              style={{
+                boxShadow: scheduleHover ? '0 8px 24px rgba(24,144,255,0.15)' : '0 4px 12px rgba(0,0,0,0.05)',
+                transition: 'box-shadow 0.3s ease',
+                pointerEvents: 'none',
+              }}
             />
           </section>
 
-          {/* Call to Action */}
-          <section style={{ 
-            padding: '100px 20px', 
-            background: '#001529', 
-            textAlign: 'center',
-            borderRadius: '0' 
-          }}>
-            <Title level={2} style={{ color: 'white', marginBottom: '24px' }}>
-              Не знаеш откъде да започнеш?
-            </Title>
-            <Paragraph style={{ color: 'rgba(255,255,255,0.7)', fontSize: '18px', marginBottom: '32px' }}>
-              Ела на място, разгледай залата и направи първата си тренировка безплатно.
-            </Paragraph>
-            <Button type="primary" size="large" icon={<CheckCircle2 size={20} />} style={{ height: '54px', padding: '0 40px' }}>
-              ЗАПИШИ СЕ СЕГА
-            </Button>
+          {/* ── CTA ── */}
+          <section
+            id="contact"
+            style={{
+              ...revealStyle(ctaReveal.isVisible),
+              padding: '100px 20px',
+              background: '#001529',
+              textAlign: 'center',
+            }}
+          >
+            <div ref={ctaReveal.ref}>
+              <Title level={2} style={{ color: 'white', marginBottom: 24 }}>
+                Не знаеш откъде да започнеш?
+              </Title>
+              <Paragraph style={{ color: 'rgba(255,255,255,0.7)', fontSize: 18, marginBottom: 32 }}>
+                Ела на място, разгледай залата и направи първата си тренировка безплатно.
+              </Paragraph>
+              <Button type="primary" size="large" icon={<CheckCircle2 size={20} />} style={{ height: 54, padding: '0 40px' }}>
+                ЗАПИШИ СЕ СЕГА
+              </Button>
+            </div>
           </section>
         </Content>
 
-        {/* Футър */}
+        {/* ── FOOTER ── */}
         <Footer style={{ background: '#f5f5f5', padding: '60px 10%' }}>
           <Row gutter={[40, 40]}>
             <Col xs={24} md={10}>
               <Title level={4}>OSSU BJJ BULGARIA</Title>
               <Paragraph type="secondary">
-                Ние вярваме, че Бразилското Жиу-Жицу е за всеки – независимо от възраст, 
+                Ние вярваме, че Бразилското Жиу-Жицу е за всеки – независимо от възраст,
                 пол или атлетични възможности. Присъедини се към нас и открий своята сила.
               </Paragraph>
             </Col>
             <Col xs={24} md={7}>
               <Title level={4}>Локация</Title>
               <Space direction="vertical">
-                <Text><MapPin size={16} style={{ marginRight: 8 }} /> София, бул. "Витоша" 100</Text>
-                <Text><Phone size={16} style={{ marginRight: 8 }} /> +359 88 000 0000</Text>
+                <Text><MapPin size={16} style={{ marginRight: 8 }} />София, бул. "Витоша" 100</Text>
+                <Text><Phone size={16} style={{ marginRight: 8 }} />+359 88 000 0000</Text>
               </Space>
             </Col>
             <Col xs={24} md={7}>
               <Title level={4}>Социални мрежи</Title>
-              <Space size="large">
-                {/* <a href="#" style={{ color: '#1890ff' }}><Facebook size={28} /></a>
-
-                <a href="#" style={{ color: '#E1306C' }}><Instagram size={28} /></a> */}
-              </Space>
             </Col>
           </Row>
           <Divider />
@@ -192,6 +289,13 @@ const BJJHomePage: React.FC = () => {
           </div>
         </Footer>
       </Layout>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .desktop-nav { display: none !important; }
+          .mobile-burger { display: block !important; }
+        }
+      `}</style>
     </ConfigProvider>
   );
 };
