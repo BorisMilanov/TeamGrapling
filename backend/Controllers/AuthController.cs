@@ -65,6 +65,7 @@ public class AuthController : ControllerBase
             email = user.Email,
             firstName = user.FirstName,
             lastName = user.LastName,
+            role = user.Role,
         });
     }
 
@@ -78,6 +79,7 @@ public class AuthController : ControllerBase
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+            new Claim(ClaimTypes.Role, user.Role),
         };
 
         var token = new JwtSecurityToken(

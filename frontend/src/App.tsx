@@ -6,7 +6,9 @@ import ScheduleTable from './pages/ScheduleTable';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CalendarPage from './pages/CalendarPage';
+import AdminCalendarPage from './pages/AdminCalendarPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 
 const Price: React.FC = () => <h2 style={{ padding: 40 }}>Pricing Table</h2>;
 const About: React.FC = () => <h2 style={{ padding: 40 }}>About the Team</h2>;
@@ -27,6 +29,14 @@ function App(): React.JSX.Element {
             <ProtectedRoute>
               <CalendarPage />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/calendar"
+          element={
+            <AdminRoute>
+              <AdminCalendarPage />
+            </AdminRoute>
           }
         />
       </Routes>

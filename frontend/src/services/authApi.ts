@@ -5,6 +5,7 @@ export interface AuthResponse {
   email: string;
   firstName: string;
   lastName: string;
+  role: string;
 }
 
 export interface ApiError {
@@ -38,16 +39,21 @@ export const authApi = {
 export const authStorage = {
   save: (data: AuthResponse) => {
     localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify({ email: data.email, firstName: data.firstName, lastName: data.lastName }));
+    localStorage.setItem('user', JSON.stringify({ email: data.email, firstName: data.firstName, lastName: data.lastName, role: data.role }));
   },
   clear: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   },
   getToken: () => localStorage.getItem('token'),
-  getUser: (): { email: string; firstName: string; lastName: string } | null => {
+  getUser: (): { email: string; firstName: string; lastName: string; role: string } | null => {
     const raw = localStorage.getItem('user');
     return raw ? JSON.parse(raw) : null;
+  },
+  isAdmin: () => {
+    const raw = localStorage.getItem('user');
+    if (!raw) return false;
+    return JSON.parse(raw)?.role === 'admin';
   },
   isLoggedIn: () => !!localStorage.getItem('token'),
 };

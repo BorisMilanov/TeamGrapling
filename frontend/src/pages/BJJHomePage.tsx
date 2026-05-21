@@ -92,6 +92,7 @@ const BJJHomePage: React.FC = () => {
     { key: 'schedule', label: 'График' },
     { key: 'contact', label: 'Контакти' },
     ...(user ? [{ key: 'calendar-link', label: 'Календар' }] : []),
+    ...(user?.role === 'admin' ? [{ key: 'admin-calendar', label: 'Админ панел' }] : []),
   ];
 
   return (
@@ -117,7 +118,11 @@ const BJJHomePage: React.FC = () => {
               theme="dark" mode="horizontal"
               defaultSelectedKeys={['hero']}
               items={navItems}
-              onClick={(e) => e.key === 'calendar-link' ? navigate('/calendar') : scrollTo(e.key)}
+              onClick={(e) => {
+                  if (e.key === 'calendar-link') navigate('/calendar');
+                  else if (e.key === 'admin-calendar') navigate('/admin/calendar');
+                  else scrollTo(e.key);
+                }}
               style={{ minWidth: 300, borderBottom: 'none', justifyContent: 'flex-end' }}
             />
             {user ? (
@@ -140,7 +145,7 @@ const BJJHomePage: React.FC = () => {
             ) : (
               <Space>
                 <Button type="text" style={{ color: 'white' }} onClick={() => navigate('/login')}>Влез</Button>
-                <Button type="primary" onClick={() => navigate('/register')}>Регистрация</Button>
+                {/* <Button type="primary" onClick={() => navigate('/register')}>Регистрация</Button> */}
               </Space>
             )}
           </div>
@@ -164,7 +169,11 @@ const BJJHomePage: React.FC = () => {
             <Menu
               theme="dark" mode="vertical"
               items={navItems}
-              onClick={(e) => e.key === 'calendar-link' ? navigate('/calendar') : scrollTo(e.key)}
+              onClick={(e) => {
+                  if (e.key === 'calendar-link') navigate('/calendar');
+                  else if (e.key === 'admin-calendar') navigate('/admin/calendar');
+                  else scrollTo(e.key);
+                }}
               style={{ borderRight: 'none' }}
             />
           </div>

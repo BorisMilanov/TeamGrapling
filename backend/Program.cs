@@ -40,11 +40,24 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Auto-create the SQLite database on first run
+// Auto-create the SQLite database and seed admin
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();
+
+    if (!db.Users.Any(u => u.Email == "admin@gmail.com"))
+    {
+        db.Users.Add(new TeamGrapling.Api.Models.User
+        {
+            Email = "admin@gmail.com",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("123try"),
+            FirstName = "Admin",
+            LastName = "Admin",
+            Role = "admin",
+        });
+        db.SaveChanges();
+    }
 }
 
 app.UseCors("FrontendPolicy");

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TeamGrapling.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+59d55d9e1917aa0510cc066f014de962517b36dd")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bd63748414ccab08b5b95a3e9236e20f929061b3")]
 [assembly: System.Reflection.AssemblyProductAttribute("TeamGrapling.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TeamGrapling.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

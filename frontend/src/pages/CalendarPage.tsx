@@ -1,47 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Layout, Calendar, Badge, Typography, ConfigProvider,
   Menu, Button, Space, Dropdown,
 } from 'antd';
-import type { CalendarProps } from 'antd';
+import type { BadgeProps, CalendarProps } from 'antd';
 import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { useNavigate } from 'react-router';
 import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import { authStorage } from '../services/authApi';
+import { calendarApi, type CalendarEvent } from '../services/calendarApi';
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
 
-type TrainingType = 'success' | 'warning' | 'error' | 'default' | 'processing';
-
-interface TrainingEvent {
-  type: TrainingType;
-  content: string;
-}
-
-const trainingSchedule: Record<number, TrainingEvent[]> = {
-  1: [{ type: 'success', content: 'Основи 17:00' }],
-  3: [{ type: 'warning', content: 'No-Gi 17:00' }],
-  5: [{ type: 'success', content: 'Основи 17:00' }],
-  8: [{ type: 'success', content: 'Основи 17:00' }],
-  10: [{ type: 'warning', content: 'No-Gi 17:00' }],
-  12: [{ type: 'success', content: 'Основи 17:00' }],
-  13: [{ type: 'processing', content: 'Open Mat 10:00' }],
-  15: [{ type: 'success', content: 'Основи 17:00' }],
-  17: [{ type: 'warning', content: 'No-Gi 17:00' }],
-  19: [{ type: 'success', content: 'Основи 17:00' }],
-  20: [{ type: 'processing', content: 'Open Mat 10:00' }],
-  22: [{ type: 'success', content: 'Основи 17:00' }],
-  24: [{ type: 'warning', content: 'No-Gi 17:00' }],
-  26: [{ type: 'success', content: 'Основи 17:00' }],
-  27: [{ type: 'processing', content: 'Open Mat 10:00' }],
-  29: [{ type: 'success', content: 'Основи 17:00' }],
-  31: [{ type: 'warning', content: 'No-Gi 17:00' }],
-};
+const SEMINAR_COLOR = 'purple';
 
 const CalendarPage: React.FC = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(authStorage.getUser);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+
+  useEffect(() => {
+    calendarApi.getAll().then(setEvents).catch(() => {});
+  }, []);
 
   const handleLogout = () => {
     authStorage.clear();
@@ -51,16 +33,21 @@ const CalendarPage: React.FC = () => {
 
   const cellRender: CalendarProps<Dayjs>['cellRender'] = (current, info) => {
     if (info.type !== 'date') return info.originNode;
-    const day = current.date();
-    const events = trainingSchedule[day];
-    if (!events) return null;
+    const dayEvents = events.filter(ev => dayjs(ev.date).isSame(current, 'day'));
+    if (!dayEvents.length) return null;
     return (
       <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-        {events.map((ev, i) => (
-          <li key={i}>
-            <Badge status={ev.type} text={ev.content} />
-          </li>
-        ))}
+        {dayEvents.map((ev) =>
+          ev.type === 'seminar' ? (
+            <li key={ev.id}>
+              <Badge color={SEMINAR_COLOR} text={ev.title} />
+            </li>
+          ) : (
+            <li key={ev.id}>
+              <Badge status={ev.type as BadgeProps['status']} text={ev.title} />
+            </li>
+          )
+        )}
       </ul>
     );
   };
@@ -85,7 +72,6 @@ const CalendarPage: React.FC = () => {
             mode="horizontal"
             selectedKeys={['/calendar']}
             items={[
-              { key: '/', label: 'Начало' },
               { key: '/calendar', label: 'Календар' },
             ]}
             onClick={(e) => navigate(e.key)}
@@ -123,10 +109,11 @@ const CalendarPage: React.FC = () => {
             <Title level={3} style={{ marginBottom: 24 }}>
               График на тренировките
             </Title>
-            <div style={{ marginBottom: 16, display: 'flex', gap: 24 }}>
+            <div style={{ marginBottom: 16, display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+              <Badge color={SEMINAR_COLOR} text="Семинар" />
               <Badge status="success" text="Основи (Gi)" />
               <Badge status="warning" text="No-Gi" />
-              <Badge status="processing" text="Open Mat" />
+<Badge status="error" text="Отменено" />
             </div>
             <Calendar cellRender={cellRender} />
           </div>
