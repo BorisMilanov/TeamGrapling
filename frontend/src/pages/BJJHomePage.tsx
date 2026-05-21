@@ -247,7 +247,7 @@ const BJJHomePage: React.FC = () => {
             }}
           >
             <div style={{ textAlign: 'center', marginBottom: 48 }}>
-              <Tag color="blue">SCHEDULE</Tag>
+              <Tag color="blue"  style={{ fontSize: 22, padding: '14px 24px', marginBottom: 12 }}>График</Tag>
               <Title level={2}>График на тренировките</Title>
               {scheduleHover && (
                 <Text type="secondary" style={{ fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>

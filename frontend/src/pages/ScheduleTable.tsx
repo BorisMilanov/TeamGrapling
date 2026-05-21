@@ -21,32 +21,37 @@ const ScheduleTable: React.FC = () => {
 
   const scheduleData: ScheduleItem[] = [
     { key: '1', time: '17:00 - 18:30', mon: 'MMA', tue: 'No-Gi', wed: 'Gi', thu: 'No-Gi', fri: 'No-Gi' },
-    { key: '2', time: '18:00 - 19:30', mon: 'Основи', tue: 'No-Gi', wed: 'Основи', thu: 'No-Gi', fri: 'Open Mat' },
-    { key: '3', time: '19:30 - 21:00', mon: 'Напреднали', tue: 'Напреднали', wed: 'Напреднали', thu: 'Напреднали', fri: 'Спаринг' },
+
   ];
 
+  const colStyle: React.CSSProperties = {
+    fontSize: 18,
+    textAlign: 'center',
+    fontWeight: 600,
+  };
+
   const columns: ColumnsType<ScheduleItem> = [
-    { title: 'Час', dataIndex: 'time', key: 'time', fixed: 'left', width: 140 },
-    { title: 'Пон', dataIndex: 'mon', key: 'mon' },
-    { title: 'Вт', dataIndex: 'tue', key: 'tue' },
-    { title: 'Ср', dataIndex: 'wed', key: 'wed' },
-    { title: 'Чет', dataIndex: 'thu', key: 'thu' },
-    { title: 'Пет', dataIndex: 'fri', key: 'fri' },
+    { title: <span style={{ fontSize: 18 }}>Час</span>, dataIndex: 'time', key: 'time', fixed: 'left', width: 200, onCell: () => ({ style: { fontSize: 18, fontWeight: 700 } }) },
+    { title: <span style={colStyle}>Понеделник</span>, dataIndex: 'mon', key: 'mon', onCell: () => ({ style: colStyle }) },
+    { title: <span style={colStyle}>Вторник</span>, dataIndex: 'tue', key: 'tue', onCell: () => ({ style: colStyle }) },
+    { title: <span style={colStyle}>Сряда</span>, dataIndex: 'wed', key: 'wed', onCell: () => ({ style: colStyle }) },
+    { title: <span style={colStyle}>Четвъртък</span>, dataIndex: 'thu', key: 'thu', onCell: () => ({ style: colStyle }) },
+    { title: <span style={colStyle}>Петък</span>, dataIndex: 'fri', key: 'fri', onCell: () => ({ style: colStyle }) },
   ];
 
   return (
-    <section style={{ padding: '60px 10%', background: '#fff', minHeight: '100vh' }}>
+    <section style={{ padding: '60px 5%', background: '#fff', minHeight: '100vh' }}>
       <Button
         icon={<ArrowLeft size={16} />}
         onClick={() => navigate('/')}
-        style={{ marginBottom: 32 }}
+        style={{ marginBottom: 32, height: 44, fontSize: 16, paddingInline: 20 }}
       >
         Назад
       </Button>
 
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
-        <Tag color="blue">SCHEDULE</Tag>
-        <Title level={2}>График на тренировките</Title>
+        <Tag color="blue" style={{ fontSize: 15, padding: '4px 14px', marginBottom: 12 }}>График</Tag>
+        <Title level={1}>График на тренировките</Title>
       </div>
 
       <Table
@@ -54,8 +59,16 @@ const ScheduleTable: React.FC = () => {
         columns={columns}
         pagination={false}
         bordered
-        scroll={{ x: 700 }}
-        style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+        scroll={{ x: 900 }}
+        rowClassName={() => 'schedule-row'}
+        style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.08)', fontSize: 18 }}
+        components={{
+          body: {
+            row: (props: React.HTMLAttributes<HTMLTableRowElement>) => (
+              <tr {...props} style={{ height: 72 }} />
+            ),
+          },
+        }}
       />
     </section>
   );

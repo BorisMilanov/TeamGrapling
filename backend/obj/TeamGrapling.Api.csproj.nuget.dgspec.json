@@ -1,26 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "/Users/boris/Documents/GitHub/TeamGrapling/backend/TeamGrapling.Api.csproj": {}
+    "E:\\work\\TeamGrapling\\TeamGrapling\\backend\\TeamGrapling.Api.csproj": {}
   },
   "projects": {
-    "/Users/boris/Documents/GitHub/TeamGrapling/backend/TeamGrapling.Api.csproj": {
+    "E:\\work\\TeamGrapling\\TeamGrapling\\backend\\TeamGrapling.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/boris/Documents/GitHub/TeamGrapling/backend/TeamGrapling.Api.csproj",
+        "projectUniqueName": "E:\\work\\TeamGrapling\\TeamGrapling\\backend\\TeamGrapling.Api.csproj",
         "projectName": "TeamGrapling.Api",
-        "projectPath": "/Users/boris/Documents/GitHub/TeamGrapling/backend/TeamGrapling.Api.csproj",
-        "packagesPath": "/Users/boris/.nuget/packages/",
-        "outputPath": "/Users/boris/Documents/GitHub/TeamGrapling/backend/obj/",
+        "projectPath": "E:\\work\\TeamGrapling\\TeamGrapling\\backend\\TeamGrapling.Api.csproj",
+        "packagesPath": "C:\\Users\\boris\\.nuget\\packages\\",
+        "outputPath": "E:\\work\\TeamGrapling\\TeamGrapling\\backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/boris/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\boris\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "/opt/homebrew/Cellar/dotnet/10.0.107/libexec/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -83,7 +82,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/10.0.107/libexec/sdk/10.0.107/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
