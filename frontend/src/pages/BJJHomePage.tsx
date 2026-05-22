@@ -88,10 +88,10 @@ const BJJHomePage: React.FC = () => {
   };
 
   const navItems = [
-    { key: 'hero', label: 'Начало' },
+   
+    ...(user ? [{ key: 'calendar-link', label: 'Календар' }] : [ { key: 'hero', label: 'Начало' },
     { key: 'schedule', label: 'График' },
-    { key: 'contact', label: 'Контакти' },
-    ...(user ? [{ key: 'calendar-link', label: 'Календар' }] : []),
+    { key: 'contact', label: 'Контакти' },]),
     ...(user?.role === 'admin' ? [{ key: 'admin-calendar', label: 'Админ панел' }] : []),
   ];
 
