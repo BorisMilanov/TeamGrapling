@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CalendarPage from './pages/CalendarPage';
 import AdminCalendarPage from './pages/AdminCalendarPage';
+import AdminMembersPage from './pages/AdminMembersPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 
@@ -36,6 +37,14 @@ function App(): React.JSX.Element {
           element={
             <AdminRoute>
               <AdminCalendarPage />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/members"
+          element={
+            <AdminRoute>
+              <AdminMembersPage />
             </AdminRoute>
           }
         />

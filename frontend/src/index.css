@@ -7,12 +7,3 @@ html, body, #root {
 
 /* Ensure the Ant Design Layout component also takes full height */
 
-@media (max-width: 767px) {
-  .mobile-calendar-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .mobile-calendar-wrapper .ant-picker-calendar-mini {
-    width: 100%;
-  }
-}

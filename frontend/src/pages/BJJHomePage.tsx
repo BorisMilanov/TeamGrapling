@@ -1,8 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
 import {
   Layout, Menu, Button, Row, Col, Typography, Card, Table,
-  Space, Divider, ConfigProvider, Tag, Dropdown,
+  Space, Divider, ConfigProvider, Tag, Dropdown, Grid,
 } from 'antd';
+
+const { useBreakpoint } = Grid;
 import type { ColumnsType } from 'antd/es/table';
 import { Users, ShieldCheck, Trophy, MapPin, Phone, CheckCircle2, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router';
@@ -54,6 +56,8 @@ function revealStyle(isVisible: boolean, delay = 0): React.CSSProperties {
 
 const BJJHomePage: React.FC = () => {
   const navigate = useNavigate();
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scheduleHover, setScheduleHover] = useState(false);
   const [user, setUser] = useState(authStorage.getUser);
@@ -88,11 +92,14 @@ const BJJHomePage: React.FC = () => {
   };
 
   const navItems = [
-   
+
     ...(user ? [{ key: 'calendar-link', label: 'Календар' }] : [ { key: 'hero', label: 'Начало' },
     { key: 'schedule', label: 'График' },
     { key: 'contact', label: 'Контакти' },]),
-    ...(user?.role === 'admin' ? [{ key: 'admin-calendar', label: 'Админ панел' }] : []),
+    ...(user?.role === 'admin' ? [
+      { key: 'admin-calendar', label: 'Админ панел' },
+      { key: 'admin-members', label: 'Членове' },
+    ] : []),
   ];
 
   return (
@@ -121,6 +128,7 @@ const BJJHomePage: React.FC = () => {
               onClick={(e) => {
                   if (e.key === 'calendar-link') navigate('/calendar');
                   else if (e.key === 'admin-calendar') navigate('/admin/calendar');
+                  else if (e.key === 'admin-members') navigate('/admin/members');
                   else scrollTo(e.key);
                 }}
               style={{ minWidth: 300, borderBottom: 'none', justifyContent: 'flex-end' }}
@@ -172,6 +180,7 @@ const BJJHomePage: React.FC = () => {
               onClick={(e) => {
                   if (e.key === 'calendar-link') navigate('/calendar');
                   else if (e.key === 'admin-calendar') navigate('/admin/calendar');
+                  else if (e.key === 'admin-members') navigate('/admin/members');
                   else scrollTo(e.key);
                 }}
               style={{ borderRight: 'none' }}
@@ -197,11 +206,15 @@ const BJJHomePage: React.FC = () => {
                 Добре дошли в най-гостоприемната зала за бойни изкуства.
                 Започни своето пътешествие днес!
               </Paragraph>
-              <Space size="large" wrap>
-                <Button type="primary" size="large" style={{ height: 50, padding: '0 40px' }}>
+              <Space
+                direction={isMobile ? 'vertical' : 'horizontal'}
+                size="large"
+                style={isMobile ? { display: 'flex', alignItems: 'center', width: '100%' } : undefined}
+              >
+                <Button type="primary" size="large" style={{ height: 50, padding: '0 40px', ...(isMobile && { width: 240 }) }}>
                   ЗАПИШИ СЕ СЕГА
                 </Button>
-                <Button ghost size="large" style={{ height: 50 }} onClick={() => scrollTo('schedule')}>
+                <Button ghost size="large" style={{ height: 50, ...(isMobile && { width: 240 }) }} onClick={() => scrollTo('schedule')}>
                   График на тренировките
                 </Button>
               </Space>
@@ -295,7 +308,7 @@ const BJJHomePage: React.FC = () => {
               <Paragraph style={{ color: 'rgba(255,255,255,0.7)', fontSize: 18, marginBottom: 32 }}>
                 Ела на място, разгледай залата и направи първата си тренировка безплатно.
               </Paragraph>
-              <Button type="primary" size="large" icon={<CheckCircle2 size={20} />} style={{ height: 54, padding: '0 40px' }}>
+              <Button type="primary" size="middle" icon={<CheckCircle2 size={20} />} style={{ height: 54, display: 'flex', alignItems: 'center', margin: '0 auto' }}>
                 ЗАПИШИ СЕ СЕГА
               </Button>
             </div>

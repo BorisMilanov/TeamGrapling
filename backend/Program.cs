@@ -46,6 +46,16 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();
 
+    // Create Members table if the DB existed before this model was added
+    db.Database.ExecuteSqlRaw("""
+        CREATE TABLE IF NOT EXISTS "Members" (
+            "Id" INTEGER NOT NULL CONSTRAINT "PK_Members" PRIMARY KEY AUTOINCREMENT,
+            "Name" TEXT NOT NULL,
+            "Belt" TEXT NOT NULL DEFAULT 'white',
+            "CreatedAt" TEXT NOT NULL
+        )
+        """);
+
     if (!db.Users.Any(u => u.Email == "admin@gmail.com"))
     {
         db.Users.Add(new TeamGrapling.Api.Models.User
