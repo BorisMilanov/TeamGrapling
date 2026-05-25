@@ -93,7 +93,7 @@ const BJJHomePage: React.FC = () => {
 
   const navItems = [
 
-    ...(user ? [{ key: 'calendar-link', label: 'Календар' }] : [ { key: 'hero', label: 'Начало' },
+    ...(user ? [{ key: 'calendar-link', label: 'Календар' }, { key: 'members-link', label: 'Членове' }] : [ { key: 'hero', label: 'Начало' },
     { key: 'schedule', label: 'График' },
     { key: 'contact', label: 'Контакти' },]),
     ...(user?.role === 'admin' ? [
@@ -127,6 +127,7 @@ const BJJHomePage: React.FC = () => {
               items={navItems}
               onClick={(e) => {
                   if (e.key === 'calendar-link') navigate('/calendar');
+                  else if (e.key === 'members-link') navigate('/members');
                   else if (e.key === 'admin-calendar') navigate('/admin/calendar');
                   else if (e.key === 'admin-members') navigate('/admin/members');
                   else scrollTo(e.key);
@@ -179,6 +180,7 @@ const BJJHomePage: React.FC = () => {
               items={navItems}
               onClick={(e) => {
                   if (e.key === 'calendar-link') navigate('/calendar');
+                  else if (e.key === 'members-link') navigate('/members');
                   else if (e.key === 'admin-calendar') navigate('/admin/calendar');
                   else if (e.key === 'admin-members') navigate('/admin/members');
                   else scrollTo(e.key);

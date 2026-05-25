@@ -37,6 +37,7 @@ const CalendarPage: React.FC = () => {
   const isMobile = !screens.md;
 
   const [user, setUser] = useState(authStorage.getUser);
+  const isAdmin = authStorage.isAdmin();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [weekStart, setWeekStart] = useState(() => getMonday(dayjs()));
   const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs().startOf('day'));
@@ -182,7 +183,16 @@ const CalendarPage: React.FC = () => {
               theme="dark"
               mode="horizontal"
               selectedKeys={['/calendar']}
-              items={[{ key: '/calendar', label: 'Календар' }]}
+              items={[
+                { key: '/calendar', label: 'Календар' },
+                { key: '/members', label: 'Членове' },
+                ...(isAdmin
+                  ? [
+                      { key: '/admin/calendar', label: 'Календар (админ)' },
+                      { key: '/admin/members', label: 'Членове (админ)' },
+                    ]
+                  : []),
+              ]}
               onClick={(e) => navigate(e.key)}
               style={{ flex: 1, minWidth: 0, justifyContent: 'flex-end', borderBottom: 'none', marginRight: 16 }}
             />

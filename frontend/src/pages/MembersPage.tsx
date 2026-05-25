@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Layout, Typography, Button, Card, Modal, Form, Input,
-  Select, Avatar, Popconfirm, message, ConfigProvider,
-  Menu, Dropdown, Row, Col, Empty, Spin,
+  Layout, Typography, Card, Avatar, ConfigProvider,
+  Menu, Dropdown, Button, Row, Col, Empty, Spin, message,
 } from 'antd';
-import {
-  PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined, LogoutOutlined,
-} from '@ant-design/icons';
+import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
-import { membersApi, type Member, type MemberPayload, type Belt } from '../services/membersApi';
+import { membersApi, type Member, type Belt } from '../services/membersApi';
 import { authStorage } from '../services/authApi';
 
 const { Header, Content } = Layout;
@@ -33,11 +30,6 @@ const BELT_MAP: Record<Belt, BeltOption> = BELT_OPTIONS.reduce(
   (acc, opt) => ({ ...acc, [opt.value]: opt }),
   {} as Record<Belt, BeltOption>,
 );
-
-interface FormValues {
-  name: string;
-  belt: Belt;
-}
 
 const BeltBadge: React.FC<{ belt: Belt }> = ({ belt }) => {
   const opt = BELT_MAP[belt] ?? BELT_OPTIONS[0];
@@ -70,74 +62,37 @@ const BeltBadge: React.FC<{ belt: Belt }> = ({ belt }) => {
   );
 };
 
-const AdminMembersPage: React.FC = () => {
+const MembersPage: React.FC = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(authStorage.getUser);
-  const isAdmin = authStorage.isAdmin();
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState<Member | null>(null);
-  const [form] = Form.useForm<FormValues>();
+  const isAdmin = authStorage.isAdmin();
 
-  const fetchMembers = async () => {
+  useEffect(() => {
     setLoading(true);
-    try {
-      setMembers(await membersApi.getAll());
-    } catch {
-      message.error('Грешка при зареждане на членовете.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { fetchMembers(); }, []);
-
-  const openCreate = () => {
-    setEditing(null);
-    form.resetFields();
-    setModalOpen(true);
-  };
-
-  const openEdit = (m: Member) => {
-    setEditing(m);
-    form.setFieldsValue({ name: m.name, belt: m.belt });
-    setModalOpen(true);
-  };
-
-  const handleSave = async () => {
-    try {
-      const values = await form.validateFields();
-      const payload: MemberPayload = { name: values.name, belt: values.belt };
-      if (editing) {
-        await membersApi.update(editing.id, payload);
-        message.success('Членът е обновен.');
-      } else {
-        await membersApi.create(payload);
-        message.success('Членът е създаден.');
-      }
-      setModalOpen(false);
-      fetchMembers();
-    } catch (err) {
-      if (err instanceof Error && err.message) message.error(err.message);
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    try {
-      await membersApi.delete(id);
-      message.success('Членът е изтрит.');
-      fetchMembers();
-    } catch {
-      message.error('Грешка при изтриване.');
-    }
-  };
+    membersApi.getAll()
+      .then(setMembers)
+      .catch(() => message.error('Грешка при зареждане на членовете.'))
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleLogout = () => {
     authStorage.clear();
     setUser(null);
     navigate('/');
   };
+
+  const navItems = [
+    { key: '/calendar', label: 'Календар' },
+    { key: '/members', label: 'Членове' },
+    ...(isAdmin
+      ? [
+          { key: '/admin/calendar', label: 'Календар (админ)' },
+          { key: '/admin/members', label: 'Членове (админ)' },
+        ]
+      : []),
+  ];
 
   return (
     <ConfigProvider theme={{ token: { colorPrimary: '#1890ff', borderRadius: 8 } }}>
@@ -157,17 +112,8 @@ const AdminMembersPage: React.FC = () => {
           <Menu
             theme="dark"
             mode="horizontal"
-            selectedKeys={['/admin/members']}
-            items={[
-              { key: '/calendar', label: 'Календар' },
-              { key: '/members', label: 'Членове' },
-              ...(isAdmin
-                ? [
-                    { key: '/admin/calendar', label: 'Календар (админ)' },
-                    { key: '/admin/members', label: 'Членове (админ)' },
-                  ]
-                : []),
-            ]}
+            selectedKeys={['/members']}
+            items={navItems}
             onClick={(e) => navigate(e.key)}
             style={{ flex: 1, minWidth: 0, justifyContent: 'flex-end', borderBottom: 'none', marginRight: 16 }}
           />
@@ -175,9 +121,7 @@ const AdminMembersPage: React.FC = () => {
           {user && (
             <Dropdown
               menu={{
-                items: [
-                  { key: 'logout', label: 'Изход', icon: <LogoutOutlined />, onClick: handleLogout },
-                ],
+                items: [{ key: 'logout', label: 'Изход', icon: <LogoutOutlined />, onClick: handleLogout }],
               }}
               placement="bottomRight"
             >
@@ -193,12 +137,7 @@ const AdminMembersPage: React.FC = () => {
             background: '#fff', borderRadius: 16, padding: 32,
             boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-              <Title level={3} style={{ margin: 0 }}>Членове на клуба</Title>
-              <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
-                Добави член
-              </Button>
-            </div>
+            <Title level={3} style={{ marginBottom: 24 }}>Членове на клуба</Title>
 
             {loading ? (
               <div style={{ textAlign: 'center', padding: '60px 0' }}>
@@ -210,21 +149,7 @@ const AdminMembersPage: React.FC = () => {
               <Row gutter={[24, 24]}>
                 {members.map((m) => (
                   <Col key={m.id} xs={24} sm={12} md={8} lg={6}>
-                    <Card
-                      hoverable
-                      actions={[
-                        <EditOutlined key="edit" onClick={() => openEdit(m)} />,
-                        <Popconfirm
-                          key="delete"
-                          title="Изтрий члена?"
-                          okText="Да"
-                          cancelText="Не"
-                          onConfirm={() => handleDelete(m.id)}
-                        >
-                          <DeleteOutlined style={{ color: '#ff4d4f' }} />
-                        </Popconfirm>,
-                      ]}
-                    >
+                    <Card hoverable>
                       <Card.Meta
                         avatar={
                           <Avatar
@@ -244,29 +169,9 @@ const AdminMembersPage: React.FC = () => {
             )}
           </div>
         </Content>
-
-        <Modal
-          title={editing ? 'Редактирай член' : 'Нов член'}
-          open={modalOpen}
-          onOk={handleSave}
-          onCancel={() => setModalOpen(false)}
-          okText="Запази"
-          cancelText="Отказ"
-        >
-          <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
-            <Form.Item name="name" label="Име" rules={[{ required: true, message: 'Въведи име' }]}>
-              <Input placeholder="напр. Иван Петров" />
-            </Form.Item>
-            <Form.Item name="belt" label="Колан" initialValue="white" rules={[{ required: true, message: 'Избери колан' }]}>
-              <Select
-                options={BELT_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
-              />
-            </Form.Item>
-          </Form>
-        </Modal>
       </Layout>
     </ConfigProvider>
   );
 };
 
-export default AdminMembersPage;
+export default MembersPage;
