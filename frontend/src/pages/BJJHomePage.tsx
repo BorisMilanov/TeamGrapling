@@ -11,19 +11,11 @@ import { useNavigate } from 'react-router';
 import { MenuOutlined, CloseOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import { authStorage } from '../services/authApi';
 import herohomeImage from '../assets/herohome.jpg';
+import { scheduleData, type ScheduleItem } from '../data/scheduleData';
 
 const { Header, Content, Footer } = Layout;
 const { Title, Paragraph, Text } = Typography;
 
-interface ScheduleItem {
-  key: string;
-  time: string;
-  mon: string;
-  tue: string;
-  wed: string;
-  thu: string;
-  fri: string;
-}
 
 function useScrollReveal(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
@@ -71,11 +63,6 @@ const BJJHomePage: React.FC = () => {
   const { ref: scheduleRef, isVisible: scheduleVisible } = useScrollReveal();
   const { ref: ctaRef, isVisible: ctaVisible } = useScrollReveal();
 
-  const scheduleData: ScheduleItem[] = [
-    { key: '1', time: '17:00 - 18:30', mon: 'Основи', tue: 'No-Gi', wed: 'Основи', thu: 'No-Gi', fri: 'Open Mat' },
-  
-  ];
-
   const columns: ColumnsType<ScheduleItem> = [
     { title: 'Час', dataIndex: 'time', key: 'time', fixed: 'left', width: 130 },
     { title: 'Пон', dataIndex: 'mon', key: 'mon' },
@@ -97,7 +84,7 @@ const BJJHomePage: React.FC = () => {
     { key: 'schedule', label: 'График' },
     { key: 'contact', label: 'Контакти' },]),
     ...(user?.role === 'admin' ? [
-      
+
       { key: 'admin-members', label: 'Членове (админ)' },
       { key: 'admin-calendar', label: 'Календар (админ)' },
 

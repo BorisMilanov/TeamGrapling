@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import { useNavigate } from 'react-router';
 import { authStorage } from '../services/authApi';
 import { calendarApi, type CalendarEvent } from '../services/calendarApi';
+import { scheduleData, buildWeeklySchedule } from '../data/scheduleData';
 
 const { useBreakpoint } = Grid;
 const { Header, Content } = Layout;
@@ -23,6 +24,8 @@ const EVENT_TYPE_LABEL: Record<string, string> = {
   warning: 'No-Gi',
   error: 'Отменено',
 };
+
+const WEEKLY_SCHEDULE = buildWeeklySchedule(scheduleData);
 
 const getMonday = (d: Dayjs) => {
   const day = d.day();
@@ -55,9 +58,15 @@ const CalendarPage: React.FC = () => {
   const cellRender: CalendarProps<Dayjs>['cellRender'] = (current, info) => {
     if (info.type !== 'date') return info.originNode;
     const dayEvents = events.filter(ev => dayjs(ev.date).isSame(current, 'day'));
-    if (!dayEvents.length) return null;
+    const scheduled = WEEKLY_SCHEDULE[current.day()];
+    if (!dayEvents.length && !scheduled) return null;
     return (
       <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+        {scheduled && (
+          <li key="schedule">
+            <Badge status={scheduled.status} text={`${scheduled.time} ${scheduled.label}`} />
+          </li>
+        )}
         {dayEvents.map((ev) =>
           ev.type === 'seminar' ? (
             <li key={ev.id}><Badge color={SEMINAR_COLOR} text={ev.title} /></li>
@@ -71,6 +80,7 @@ const CalendarPage: React.FC = () => {
 
   const weekDays = Array.from({ length: 7 }, (_, i) => weekStart.add(i, 'day'));
   const selectedDayEvents = events.filter(ev => dayjs(ev.date).isSame(selectedDay, 'day'));
+  const selectedDaySchedule = WEEKLY_SCHEDULE[selectedDay.day()];
   const today = dayjs().startOf('day');
 
   const mobileCalendar = (
@@ -97,7 +107,7 @@ const CalendarPage: React.FC = () => {
         {weekDays.map((day, i) => {
           const isToday = day.isSame(today, 'day');
           const isSelected = day.isSame(selectedDay, 'day');
-          const hasEvents = events.some(ev => dayjs(ev.date).isSame(day, 'day'));
+          const hasEvents = events.some(ev => dayjs(ev.date).isSame(day, 'day')) || !!WEEKLY_SCHEDULE[day.day()];
           return (
             <div
               key={day.toString()}
@@ -134,12 +144,25 @@ const CalendarPage: React.FC = () => {
         <Text strong style={{ fontSize: 14, color: '#555' }}>
           {selectedDay.format('D MMMM')}
         </Text>
-        {selectedDayEvents.length === 0 ? (
+        {!selectedDaySchedule && selectedDayEvents.length === 0 ? (
           <div style={{ marginTop: 12, color: '#aaa', textAlign: 'center', padding: '24px 0' }}>
             Няма събития
           </div>
         ) : (
           <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {selectedDaySchedule && (
+              <div style={{
+                padding: '12px 16px',
+                borderRadius: 10,
+                background: '#f5f5f5',
+                borderLeft: `4px solid ${selectedDaySchedule.status === 'success' ? '#52c41a' : '#faad14'}`,
+              }}>
+                <Text strong style={{ fontSize: 14 }}>{selectedDaySchedule.label}</Text>
+                <div style={{ marginTop: 4 }}>
+                  <Text style={{ fontSize: 12, color: '#888' }}>{selectedDaySchedule.time}</Text>
+                </div>
+              </div>
+            )}
             {selectedDayEvents.map(ev => (
               <div key={ev.id} style={{
                 padding: '12px 16px',
