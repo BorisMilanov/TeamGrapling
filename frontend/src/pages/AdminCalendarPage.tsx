@@ -107,6 +107,8 @@ const AdminCalendarPage: React.FC = () => {
     navigate('/');
   };
 
+  const isAdmin = user?.role === 'admin';
+
   const columns = [
     {
       title: 'Дата',
@@ -171,13 +173,16 @@ const AdminCalendarPage: React.FC = () => {
             theme="dark"
             mode="horizontal"
             selectedKeys={['/admin/calendar']}
-            items={[
-              { key: '/', label: 'Начало' },
+     items={[
               { key: '/calendar', label: 'Календар' },
-              { key: '/admin/calendar', label: 'Админ панел' },
+              { key: '/members', label: 'Членове' },
+              ...(isAdmin
+                ? [
+                    { key: '/admin/calendar', label: 'Календар (админ)' },
+                    { key: '/admin/members', label: 'Членове (админ)' },
+                  ]
+                : []),
             ]}
-            onClick={(e) => navigate(e.key)}
-            style={{ flex: 1, minWidth: 0, justifyContent: 'flex-end', borderBottom: 'none', marginRight: 16 }}
           />
 
           {user && (

@@ -97,8 +97,10 @@ const BJJHomePage: React.FC = () => {
     { key: 'schedule', label: 'График' },
     { key: 'contact', label: 'Контакти' },]),
     ...(user?.role === 'admin' ? [
-      { key: 'admin-calendar', label: 'Админ панел' },
-      { key: 'admin-members', label: 'Членове' },
+      
+      { key: 'admin-members', label: 'Членове (админ)' },
+      { key: 'admin-calendar', label: 'Календар (админ)' },
+
     ] : []),
   ];
 
